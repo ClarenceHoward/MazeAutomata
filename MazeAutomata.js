@@ -61,7 +61,7 @@ const createTile = index => {
 const createTiles = quantity => {
   backgroundGrid.innerHTML = "";
   for (let index = 0; index < quantity; index++) {
-    graph.setNode(index, {state: 'disconnected'});
+    graph.setNode(index, {visited: false});
     backgroundGrid.appendChild(createTile(index));
   }
 }
@@ -97,7 +97,7 @@ function randomBranch(seed){
   let random = getRandomInt(0,4);
 
   if(random == 0){
-    if(getRandomInt(0,1) == 0){
+    if(getRandomInt(0,3) == 0){
       if(getRandomInt(0,1) == 0){
         let newSeed = new Pair(seed.getIndex(),(direction+1) % 4 );
         newCell(newSeed);
@@ -109,7 +109,7 @@ function randomBranch(seed){
       
     }
     else{
-      if(getRandomInt(0,1) == 0){
+      if(getRandomInt(0,3) == 0){
         let newSeed = new Pair(seed.getIndex(),(direction-1) % 4 );
         newCell(newSeed);
         seeds.add(newSeed);
@@ -204,6 +204,30 @@ function updateTiles() {
             seed.setDirection( (seed.getDirection()+1) % 4);
             if(!newCell(seed)){
               seeds.delete(seed);
+              if(seeds.size < 4){
+    
+                let newSeedFound = false;
+                
+                        while (!newSeedFound && disconnected.size > 0) {
+                          for (let j of disconnected) {
+                            let index = getRandomElement(disconnected);
+                            for (let i = 0; i < 4; i++) {
+                              let nextSeed = getNext(index, i);
+                              if (nextSeed >= 0 && nextSeed < rows * columns && !wrapAround(index, nextSeed)) {
+                                if (graph.outEdges(nextSeed).length > 0) {
+                                  addEdges(index, nextSeed, i);
+                                  seeds.add(new Pair(index, i));
+                                  newSeedFound = true;
+                                  break;
+                                }
+                              }
+                            }
+                            if (newSeedFound) break;
+                          }
+                
+              }
+            
+            }
                
             }
           }
@@ -213,30 +237,7 @@ function updateTiles() {
         }
       }
   }
-  if(seeds.size< 4){
-    
-    let newSeedFound = false;
-    
-            while (!newSeedFound && disconnected.size > 0) {
-              for (let j of disconnected) {
-                let index = getRandomElement(disconnected);
-                for (let i = 0; i < 4; i++) {
-                  let nextSeed = getNext(index, i);
-                  if (nextSeed >= 0 && nextSeed < rows * columns && !wrapAround(index, nextSeed)) {
-                    if (graph.outEdges(nextSeed).length > 0) {
-                      addEdges(index, nextSeed, i);
-                      seeds.add(new Pair(index, i));
-                      newSeedFound = true;
-                      break;
-                    }
-                  }
-                }
-                if (newSeedFound) break;
-              }
-    
-  }
-
-}
+  
 }
 
 }
@@ -297,8 +298,11 @@ function getRandomElement(set) {
 function gameLoop () {
   updateTiles();
     if(seeds.size == 0){
-    console.log("done")
+    console.log("done");
+    depthFirstSearch(0);
+    console.log("done1");
     clearInterval(intervalId);
+    console.log("done2");
   }
 
 
@@ -312,21 +316,66 @@ function gameLoop () {
 document.addEventListener('DOMContentLoaded', () => {
   createGrid();
   let randInt = getRandomInt(0,rows*columns);
-  seeds.add(new Pair(randInt,1));
+  
   seeds.add(new Pair(randInt,2));
-  seeds.add(new Pair(randInt,3));
   seeds.add(new Pair(randInt,4));
   intervalId = setInterval(gameLoop, gameloopInterval); // Updates per millisecond
 });
 
 window.onresize = () => createGrid();
 
-function recursiveSearch(graph, node, stack){
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function recursiveSearch(node){
+  
+  if(Number(node) == ((rows*columns)-1)){
+    let tile = document.querySelectorAll('.tile')[node];
+    if(tile){
+      tile.classList.add('dfs');
+    }
+    return Number(node);
+  }
+
+  else{
+    graph.setNode(node, { state: true});
+    let tile = document.querySelectorAll('.tile')[node];
+    if(tile){
+      tile.classList.add('dfs');
+    }
+    for (let element of graph.outEdges(node))  {
+      if(!graph.node(element.w).state ){
+        await sleep(gameloopInterval);
+         let newNode = await recursiveSearch(element.w);
+        if(newNode == (rows*columns)-1){
+          console.log("found");
+          if(tile){
+            tile.classList.remove("marked");
+            tile.classList.add('dfs');
+          }
+
+          
+          return newNode;
+        }
+
+      }
+    }
+    if(tile){
+      tile.classList.remove("dfs");
+      tile.classList.add("marked");
+    }
+      
+    return node;
+  }
+  
+  
 
 }
 
-function  depthFirstSearch(graph, start){
-
-
+function  depthFirstSearch(start){
+  
+   recursiveSearch(0);
+  
 }
 
