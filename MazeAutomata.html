@@ -8,6 +8,31 @@
 </head>
 <body>
     <div id="tiles"></div>
+    <div id = "centering">
+        <div id = "settingsBox">
+            <div class = "SliderBox">
+                <h3>Interval Speed (ms)</h3>
+                <input type="range" id="SpeedSlider" min="5" max="1000" value="100" step="1" class = "Slider">
+                <p>Value: <span id="speedValue">30</span></p>
+            </div>
+            <div class = "SliderBox">
+                <h3>Branch Probability</h3>
+                <input type="range" id="BranchSlider" min="1" max="300" value="4" step="1"class = "Slider">
+                <p>Value: <span id="branchValue">1/4</span></p>
+            </div>
+            <div class = "SliderBox" >
+                <h3>Turn Probability</h3>
+                <input type="range" id="TurnSlider" min="1" max="300" value="4" step="1"class = "Slider">
+                <p>Value: <span id="turnValue">1/4</span></p>
+            </div>
+            <button class = "btn" id="generate">Generate</button>
+            <button class = "btn" id="solve">Solve</button>
+            <button class = "btn" id="reset">Reset</button>
+        </div>
+    </div>
+    
+    
+    
     <script src = "GraphLib.js"></script>
     <script src = "MazeAutomata.js"></script>    
 </body>
