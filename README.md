@@ -6,7 +6,7 @@ It is still a work in progress and there are some small bugs.
 
 ## Attribution
 
-I used the library [GraphLib] (https://github.com/dagrejs/graphlib) to create the graph that represents the maze.
+I used the library [GraphLib](https://github.com/dagrejs/graphlib) to create the graph that represents the maze.
 
 ## Installation
 
