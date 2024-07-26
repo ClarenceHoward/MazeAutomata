@@ -4,6 +4,10 @@ This is an implementation of maze generating cellular automata based on the rule
 
 It is still a work in progress and there are some small bugs.
 
+## Attribution
+
+I used the library [GraphLib] (https://github.com/dagrejs/graphlib) to create the graph that represents the maze.
+
 ## Installation
 
 Open **MazeAutomata.html** in a browser of your choice.
