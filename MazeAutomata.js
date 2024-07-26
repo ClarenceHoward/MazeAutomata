@@ -53,7 +53,7 @@ document.getElementById('solve').addEventListener('click', function() {
 });
 
 document.getElementById('reset').addEventListener('click', function() {
-  clearInterval(intervalId);
+  clearInterval(intervalId); 
   graph = new Graph();
   seeds = new Set();
   disconnected = new Set();
@@ -356,6 +356,7 @@ function addEdges(node1, node2, direction) {
 
 // Recursive depth-first search for solving the maze
 async function recursiveSearch(node) {
+  
     if (Number(node) == ((rows * columns) - 1)) {
         let tile = document.querySelectorAll('.tile')[node];
         if (tile) {
