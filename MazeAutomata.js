@@ -98,7 +98,7 @@ class Pair {
   }
 }
 
-// Creates a single tile and adds it to the div
+// Creates a single tile and adds it to the document
 const createTile = index => {
   const tile = document.createElement("div");
   tile.classList.add("tile");
@@ -203,6 +203,7 @@ function getNext(index, direction) {
 
 // Checks if the next move wraps around the grid
 function wrapAround(index, nextSeed) {
+
     let a = nextSeed % columns == 0;
     let b = (index % columns) == (columns - 1);
     let c = a && b;
@@ -214,7 +215,7 @@ function wrapAround(index, nextSeed) {
     return c || f;
 }
 
-// Creates a new cell in the maze
+// Checks to see if the next cell in the direction of the seed is a valid addition to the maze
 function newCell(seed) {
     let nextSeed = getNext(seed.getIndex(), seed.getDirection());
 
@@ -230,32 +231,8 @@ function newCell(seed) {
     }
 }
 
-// Creates a new seed when all existing seeds are stuck
-function failSafe() {
-    if (seeds.size < 1) {
-        let newSeedFound = false;
 
-        while (!newSeedFound && disconnected.size > 0) {
-            for (let j of disconnected) {
-                let index = getRandomElement(disconnected);
-                for (let i = 0; i < 4; i++) {
-                    let nextSeed = getNext(index, i);
-                    if (nextSeed >= 0 && nextSeed < rows * columns && !wrapAround(index, nextSeed)) {
-                        if (graph.outEdges(nextSeed).length > 0) {
-                            addEdges(index, nextSeed, i);
-                            seeds.add(new Pair(index, i));
-                            newSeedFound = true;
-                            break;
-                        }
-                    }
-                }
-                if (newSeedFound) break;
-            }
-        }
-    }
-}
-
-// Updates the tiles in the maze
+// Iterates through all the seeds in the set and adds one tile to the maze for each one if possible
 function updateTiles() {
     for (let seed of seeds) {
         randomTurn(seed);
@@ -272,9 +249,11 @@ function updateTiles() {
                     if (!newCell(seed)) {
                         seed.setDirection((seed.getDirection() + 1) % 4);
 
+                        //deleted seed if it is stuck
                         if (!newCell(seed)) {
                             seeds.delete(seed);
 
+                            // Creates a new seed when all existing seeds are deleted
                             if (seeds.size < 1) {
                                 let newSeedFound = false;
                                 while (!newSeedFound && disconnected.size > 0) {
@@ -308,7 +287,7 @@ function updateTiles() {
     }
 }
 
-// Sets the margin for a tile
+// Sets the margin between tiles to zero to connect them.
 function setMargin(elementId, side, value) {
     const tile = document.querySelectorAll('.tile')[elementId];
     if (tile) {
